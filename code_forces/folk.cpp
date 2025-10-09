@@ -7,7 +7,7 @@ using namespace std;
 
 string slicer(string media_name, int start)
 {
-    size_t pos = media_name.substr(start, media_name.size() - start).find_last_of("0123456789") + start; // 9
+    size_t pos = media_name.substr(start, media_name.size() - start).find_last_of("0123456789") + start;
     if (pos == string::npos)
         return "";
     size_t begin = media_name.find_last_not_of("0123456789");
