@@ -1,5 +1,4 @@
-﻿using System;
-using System.Buffers;
+﻿using System.Buffers;
 using System.Net.Mail;
 using System.Reflection.Metadata.Ecma335;
 namespace MyNameSpace
@@ -12,14 +11,40 @@ namespace MyNameSpace
             // control_statements_and_loops();
             //loops();
             //I_O();
-            for (char c = 'a'; c <= 'z'; c++)
+            arrays();
+
+        }
+        static void arrays()
+        {
+            int[] arr = { 1, 2, 3, 6, 5, 4 };
+            Array.Sort(arr);
+            foreach (var x in arr)
             {
-                if (c == 'n')
-                {
-                    break;
-                }
-                Console.Write(c);
+                Console.Write(x + " ");
             }
+            Console.WriteLine();
+
+            Array.Reverse(arr);
+            foreach (var x in arr)
+            {
+                Console.Write(x + " ");
+            }
+            Console.WriteLine();
+
+            Console.WriteLine("\n-----" + Array.IndexOf(arr, 6) + "\n------");
+            foreach (var x in arr)
+            {
+                Console.Write(x + " ");
+            }
+            Console.WriteLine();
+
+            Array.Clear(arr);
+            foreach (var x in arr)
+            {
+                Console.Write(x + " ");
+            }
+            Console.WriteLine();
+
         }
         static void I_O()
         {
