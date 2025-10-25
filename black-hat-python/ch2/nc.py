@@ -64,7 +64,7 @@ class Netcat:
                 while recv_len:
                     data = self.socekt.recv(4096)
                     recv_len = len(data)
-                    response = data.decode()
+                    response += data.decode()
                     if recv_len < 4096:
                         break
                 if response:
