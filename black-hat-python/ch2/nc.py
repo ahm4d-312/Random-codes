@@ -2,6 +2,9 @@ import argparse
 import textwrap
 import sys
 import socket
+import threading
+import subprocess
+import shlex
 
 
 def main():
@@ -27,10 +30,9 @@ def main():
     parser.add_argument("-p", "--port", type=int, default=5555, help="specified port")
     parser.add_argument("-u", "--uplaod", help="uplaod file")
     parser.add_argument("-l", "--listen", action="store_true", help="listen")
-    parser.add_argument("-t", "--target", default="192.168.1.11")
+    parser.add_argument("-t", "--target", default="0.0.0.0")
 
     args = parser.parse_args()
-
     if args.listen:
         buffer = ""
     else:
@@ -38,6 +40,14 @@ def main():
     nc = Netcat(args, buffer.encode())
     nc.run()
     args = parser.parse_args()
+
+
+def execute(cmd):
+    cmd = cmd.strip()
+    if not cmd:
+        return
+    output = subprocess.check_output(shlex.split(cmd), stderr=subprocess.STDOUT)
+    return output.decode()
 
 
 class Netcat:
@@ -75,7 +85,47 @@ class Netcat:
         except KeyboardInterrupt:
             print("user terminated.")
             self.socket.close()
-        sys.exit()
+            sys.exit()
+
+    def listen(self):
+        self.socket.bind((socket.args.target, socket.args.port))
+        self.socket.listen(5)
+        while True:
+            clinet_socket, client_address = self.socket.accept()
+            client_thread = threading.Thread(target=self.handle, args=(clinet_socket,))
+            client_thread.start()
+
+    def handle(self, clinet_socket):
+        if self.args.execute:
+            output = execute(self.args.execute)
+            clinet_socket.send(output.encode())
+        elif self.args.upload:
+            file_buffer = b""
+            while True:
+                data = clinet_socket.recv(4096)
+                if data:
+                    file_buffer += data
+                else:
+                    break
+            with open(self.args.upload, "wb") as f:
+                f.write(file_buffer)
+            message = f"saved file {self.args.upload}"
+            clinet_socket.send(message.encode())
+        elif self.args.command:
+            cmd_buffer = b""
+            while True:
+                try:
+                    clinet_socket.send("#> ")
+                    while "\n" not in cmd_buffer.decode():
+                        cmd_buffer += clinet_socket.recv(64)
+                    response = execute(cmd_buffer.decode())
+                    if response:
+                        clinet_socket.send(response)
+                    cmd_buffer = b""
+                except Exception as e:
+                    print(f"server killed {e}")
+                    self.socket.close()
+                    sys.exit()
 
 
 if __name__ == "__main__":
