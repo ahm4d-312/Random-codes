@@ -75,7 +75,7 @@ class Netcat:
         except KeyboardInterrupt:
             print("user terminated.")
             self.socket.close()
-            sys.exit()
+        sys.exit()
 
 
 if __name__ == "__main__":
