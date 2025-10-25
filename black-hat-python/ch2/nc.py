@@ -28,7 +28,7 @@ def main():
     parser.add_argument("-c", "--command", action="store_true", help="command shell")
     parser.add_argument("-e", "--execute", help="execute specified command")
     parser.add_argument("-p", "--port", type=int, default=5555, help="specified port")
-    parser.add_argument("-u", "--uplaod", help="uplaod file")
+    parser.add_argument("-u", "--upload", help="upload file")
     parser.add_argument("-l", "--listen", action="store_true", help="listen")
     parser.add_argument("-t", "--target", default="0.0.0.0")
 
@@ -72,7 +72,7 @@ class Netcat:
                 recv_len = 1
                 response = ""
                 while recv_len:
-                    data = self.socekt.recv(4096)
+                    data = self.socket.recv(4096)
                     recv_len = len(data)
                     response += data.decode()
                     if recv_len < 4096:
@@ -88,7 +88,7 @@ class Netcat:
             sys.exit()
 
     def listen(self):
-        self.socket.bind((socket.args.target, socket.args.port))
+        self.socket.bind((self.args.target, self.args.port))
         self.socket.listen(5)
         while True:
             clinet_socket, client_address = self.socket.accept()
