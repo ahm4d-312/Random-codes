@@ -115,12 +115,12 @@ class Netcat:
             cmd_buffer = b""
             while True:
                 try:
-                    clinet_socket.send("#> ")
+                    clinet_socket.send(b"#> ")
                     while "\n" not in cmd_buffer.decode():
                         cmd_buffer += clinet_socket.recv(64)
                     response = execute(cmd_buffer.decode())
                     if response:
-                        clinet_socket.send(response)
+                        clinet_socket.send(response.encode())
                     cmd_buffer = b""
                 except Exception as e:
                     print(f"server killed {e}")
@@ -131,3 +131,4 @@ class Netcat:
 if __name__ == "__main__":
     main()
     # print(execute("ls /"))
+    # on  bransh
