@@ -6,13 +6,13 @@ import sys
 import textwrap
 import threading
 
+
 def execute(cmd):
-    cmd=cmd.strip()
+    cmd = cmd.strip()
     if not cmd:
         return
-    output=subprocess.check_output(shlex.split(cmd),stderr=subprocess.STDOUT)
+    output = subprocess.check_output(shlex.split(cmd), stderr=subprocess.STDOUT)
     return output.decode()
 
-print("\n",execute('ls'))
 
-
+print("\n", execute("ls /"), sep="")
