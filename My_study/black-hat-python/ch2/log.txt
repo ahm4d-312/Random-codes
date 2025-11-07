@@ -1,0 +1,1 @@
+/home/ahm4d_312/random_codes/black-hat-python/My-env/bin/python: can't open file '/home/ahm4d_312/random_codes/black-hat-python/ch2/socket_1.py/home/ahm4d_312/random_codes/black-hat-python/My-env/bin/python': [Errno 20] Not a directory
