@@ -11,30 +11,35 @@ def get_html_of(url):
             f"HTTP status code of {resp.status_code} returned, but 200 was expected. Exiting..."
         )
         exit(1)
-    return resp.content.decode()
-
-
-def word_slicer(resp):
-    soup = BeautifulSoup(resp, "html.parser")
+    soup = BeautifulSoup(resp.content.decode(), "html.parser")
     raw_text = soup.get_text()
+    print(re.findall(r"\$.", raw_text))
     return re.findall(r"\w+", raw_text)
 
 
-def word_counter(words_list):
+def word_counter(words_list, Top_ten=False, Sorted=False):
     words_count = {}
     for i in words_list:
         if i not in words_count:
             words_count[i] = 1
         else:
             words_count[i] += 1
+    if Top_ten:
+        return sorted(words_count.items(), key=lambda item: item[1], reverse=True)[:10]
+    if Sorted:
+        return [
+            x[0]
+            for x in sorted(words_count.items(), key=lambda item: item[1], reverse=True)
+        ]
     return words_count
 
 
-url = "http://www.example.com"
-url_HTB_exercise = "http://94.237.122.36:33847"
-word_count = word_counter(word_slicer(get_html_of(url_HTB_exercise)))
-# print(word_count)
-top_words = sorted(word_count.items(), key=lambda item: item[1], reverse=True)
-print([top_words[x] for x in range(5)])
-top_words = [i[0] for i in top_words]
-print(top_words[0])
+def main():
+    url = "http://www.example.com"
+    url = "http://83.136.249.223:39502"
+    all_words = get_html_of(url)
+    top_words = word_counter(all_words, Sorted=True)
+
+
+if __name__ == "__main__":
+    main()
