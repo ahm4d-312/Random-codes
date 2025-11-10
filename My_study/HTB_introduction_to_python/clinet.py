@@ -1,0 +1,35 @@
+import socket
+
+
+def wait():
+    input()
+
+
+ip, port = "localhost", 4444
+client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+print(f"Created clinet object: {client}")
+wait()
+
+msg = "Hello server"
+print(f"Created the msg: {msg}, of type:{type(msg)}")
+wait()
+
+print(
+    f"Note: In order to send the msg, it must be converted to raw bytes since that the 'send' method only takes raw bytes parameters NOT str parmaeters"
+)
+wait()
+
+msg_encoded = msg.encode("UTF-8")
+print(f"encoded the msg to raw bytes: {msg_encoded}, of type: {type(msg_encoded)}")
+wait()
+
+client.sendto(msg_encoded, (ip, port))
+print(f"sent the msg: {msg},to {ip}:{port}")
+wait()
+
+response, address = client.recvfrom(1024)
+print(f"Received: {response.decode("UTF-8")},from {address}")
+wait()
+
+client.close()
+print("Finished")
