@@ -1,4 +1,6 @@
-import socket
+import subprocess
+import time
 
-clinet = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-clinet.sendto(b"b", ("localhost", 4444))
+print(99999)
+time.sleep(3)
+subprocess.run("clear")
