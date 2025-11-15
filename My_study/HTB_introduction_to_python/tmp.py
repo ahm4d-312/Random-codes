@@ -1,6 +1,4 @@
-import subprocess
-import time
+import socket
 
-print(99999)
-time.sleep(3)
-subprocess.run("clear")
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+print(socket.gethostname())
