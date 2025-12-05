@@ -1,4 +1,2 @@
-import socket
-
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-print(socket.gethostname())
+for i in range(8):
+    print(f"{i+1}.T")
