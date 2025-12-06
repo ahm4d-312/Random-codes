@@ -1,2 +1,2 @@
 # Code space
-  Here most of my projects is located
+  Here is where most of my projects is located
