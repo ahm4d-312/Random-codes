@@ -7,11 +7,7 @@ def tcp_server():
     server.bind((ip, port))
     server.listen(1)
     client, addr = server.accept()
-    i = 0
     while True:
-        if i == 10:
-            break
-        i += 1
         response = client.recv(1024)
         print(f"Received: {response.decode()}")
         if response.decode() == "exit":
