@@ -30,7 +30,7 @@ def main(target, port):
                 break
             if not chunk:
                 break
-
+            
         response = b"".join(chunks).decode()
         print(response)
         if response.strip() == "exit":
