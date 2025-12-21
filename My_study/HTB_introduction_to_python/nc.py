@@ -41,7 +41,7 @@ def main():
         buffer = sys.stdin.read()
     nc = Netcat(args, buffer.encode())
     nc.run()
-    args = parser.parse_args()
+    
 
 
 def execute_old(cmd):
@@ -114,17 +114,21 @@ class Netcat:
             output = execute(self.args.execute)
             clinet_socket.send(output.encode())
         elif self.args.upload:
-            file_buffer = b""
-            while True:
-                data = clinet_socket.recv(4096)
-                if data:
+            # A way to receive file name and len as headers first then starting receiving the file 
+            if self.args.listen:
+                file_buffer = b""
+                fname_len=int.from_bytes(clinet_socket.recv(4),'big')
+                fname=clinet_socket.recv(fname_len).decode()
+                f_len=int.from_bytes(clinet_socket.recv(8),'big')
+                fsize=int.from_bytes(clinet_socket.recv(8),'big')
+                while len(file_buffer)!=f_len:
+                    data = clinet_socket.recv(4096)
                     file_buffer += data
-                else:
-                    break
-            with open(self.args.upload, "wb") as f:
-                f.write(file_buffer)
-            message = f"saved file {self.args.upload}"
-            clinet_socket.send(message.encode())
+            
+                with open(fname, "wb") as f:
+                    f.write(file_buffer)
+                message = f"saved file {fname}"
+                clinet_socket.send(message.encode())
         elif self.args.shell:
             cmd_buffer = b""
             while True:
