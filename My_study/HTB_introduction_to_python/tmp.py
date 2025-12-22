@@ -1,2 +1,2 @@
-t="ddd\n"
-print(t)
+s=input()
+print(s.strip().split('/')[-1])

@@ -1,9 +1,6 @@
-print("I'm suffering")
-
-i = -10
-try:
-    while i:
-        print(i)
-        i -= 1
-except KeyboardInterrupt:
-    print("KeyboardInterrupt")
+import os
+print(os.getcwd())
+print(os.getcwdb())
+f=False
+f=not f
+print(f)

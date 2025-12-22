@@ -30,7 +30,7 @@ def main():
     parser.add_argument("-s", "--shell", action="store_true", help="Starts a shell")
     parser.add_argument("-e", "--execute", help="execute specified command")
     parser.add_argument("-p", "--port", type=int, default=5555, help="specified port")
-    parser.add_argument("-u", "--upload", help="upload file")
+    parser.add_argument("-u", "--upload", action="store_true",help="upload file")
     parser.add_argument("-l", "--listen", action="store_true", help="listen")
     parser.add_argument("-t", "--target", default="0.0.0.0")
 
@@ -120,7 +120,6 @@ class Netcat:
                 fname_len=int.from_bytes(clinet_socket.recv(4),'big')
                 fname=clinet_socket.recv(fname_len).decode()
                 f_len=int.from_bytes(clinet_socket.recv(8),'big')
-                fsize=int.from_bytes(clinet_socket.recv(8),'big')
                 while len(file_buffer)!=f_len:
                     data = clinet_socket.recv(4096)
                     file_buffer += data
@@ -129,6 +128,20 @@ class Netcat:
                     f.write(file_buffer)
                 message = f"saved file {fname}"
                 clinet_socket.send(message.encode())
+            else:
+                fpath=input("path:")
+                fname=fpath.strip().split('/')[-1]
+                fname_len=len(fname)
+                try:
+                    with open(fpath,'rb') as f:
+                        data=f.read()
+                    data_len=len(data)
+                except Exception as e:
+                    print(f"Error: {e}")
+                clinet_socket.sendall(fname_len.to_bytes(4,'big'))
+                clinet_socket.sendall(fname.encode())
+                clinet_socket.sendall(data.to_bytes(8,'big'))
+                clinet_socket.sendall(data)
         elif self.args.shell:
             cmd_buffer = b""
             while True:
