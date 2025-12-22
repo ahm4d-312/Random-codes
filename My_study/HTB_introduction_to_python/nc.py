@@ -5,7 +5,7 @@ import socket
 import threading
 import subprocess
 import shlex
-from os import chdir
+from os import chdir,path
 
 def main():
     parser = argparse.ArgumentParser(
@@ -108,6 +108,17 @@ class Netcat:
             del(client_address)
             client_thread = threading.Thread(target=self.handle, args=(clinet_socket,))
             client_thread.start()
+    @staticmethod
+    def recv_exact(clinet_socket,length):
+        data=b''
+        while len(data)<length:
+            chunk=clinet_socket.recv(length-len(data))
+            if not chunk:
+                print("Connection currpted!")
+                break
+            data+=chunk
+        return data
+        
 
     def handle(self, clinet_socket):
         if self.args.execute:
@@ -116,32 +127,40 @@ class Netcat:
         elif self.args.upload:
             # A way to receive file name and len as headers first then starting receiving the file 
             if self.args.listen:
-                file_buffer = b""
-                fname_len=int.from_bytes(clinet_socket.recv(4),'big')
-                fname=clinet_socket.recv(fname_len).decode()
-                f_len=int.from_bytes(clinet_socket.recv(8),'big')
-                while len(file_buffer)!=f_len:
-                    data = clinet_socket.recv(4096)
-                    file_buffer += data
-            
-                with open(fname, "wb") as f:
-                    f.write(file_buffer)
-                message = f"saved file {fname}"
-                clinet_socket.send(message.encode())
+                try:
+                    fname_len=int.from_bytes(Netcat.recv_exact(clinet_socket,4),'big')
+                    fname=Netcat.recv_exact(clinet_socket,fname_len).decode()
+                    f_len=int.from_bytes(Netcat.recv_exact(clinet_socket,8),'big')
+                    with open(fname,'wb') as f:
+                        received=0
+                        while received<f_len:
+                            chunk=clinet_socket.recv(min(4096,f_len-received))
+                            if not chunk:
+                                raise ConnectionError("Connection corrupted: The sender closed early")
+                            received+=len(chunk)
+                            f.write(chunk)
+                        del(received)
+                except ConnectionError as e:
+                    print("Upload failed: {e}")
+
             else:
                 fpath=input("path:")
                 fname=fpath.strip().split('/')[-1]
-                fname_len=len(fname)
-                try:
-                    with open(fpath,'rb') as f:
-                        data=f.read()
-                    data_len=len(data)
-                except Exception as e:
-                    print(f"Error: {e}")
+                fname_len=len(fname.encode())
+                fsize=path.getsize(fpath)
                 clinet_socket.sendall(fname_len.to_bytes(4,'big'))
                 clinet_socket.sendall(fname.encode())
-                clinet_socket.sendall(data.to_bytes(8,'big'))
-                clinet_socket.sendall(data)
+                clinet_socket.sendall(fsize.to_bytes(8,'big'))
+                try:
+                    with open(fpath,'rb') as f:
+                        while True:
+                            chunk=f.read(4096)
+                            if not chunk:
+                                break
+                            clinet_socket.sendall(chunk)
+                except Exception as e:
+                    print(f"Error: {e}")
+
         elif self.args.shell:
             cmd_buffer = b""
             while True:
